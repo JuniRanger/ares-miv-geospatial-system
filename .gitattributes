@@ -1,0 +1,26 @@
+# Detectar automáticamente archivos de texto y normalizar saltos de línea a LF
+* text=auto eol=lf
+
+# Asegurar que los archivos de Python y configuración siempre usen LF
+*.py text eol=lf
+*.sh text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.toml text eol=lf
+*.md text eol=lf
+
+# Si llegas a tener scripts exclusivos de Windows
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+
+# Marcar archivos binarios para que Git no intente modificarlos
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.sqlite3 binary
+*.db binary
+*.whl binary
