@@ -1,15 +1,20 @@
-"""Persistence model for a calculated route."""
+"""Data model for a calculated route."""
 
-from sqlalchemy import String
-from sqlalchemy.orm import Mapped, mapped_column
-
-from app.database.connection import Base
+from typing import Optional
 
 
-class Route(Base):
+class Route:
     """Route record placeholder without unverified geometry or spatial metadata."""
 
-    __tablename__ = "routes"
+    def __init__(
+        self,
+        id: str,
+        status: str,
+    ) -> None:
+        self.id = id
+        self.status = status
 
-    id: Mapped[str] = mapped_column(String(100), primary_key=True)
-    status: Mapped[str] = mapped_column(String(50), nullable=False)
+
+def create_route(id: str, status: str = "pending") -> Route:
+    """Create a route instance."""
+    return Route(id=id, status=status)

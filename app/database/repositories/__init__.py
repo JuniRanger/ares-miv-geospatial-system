@@ -1,1 +1,1 @@
-"""Database repository interfaces."""
+"""Storage repository interfaces."""

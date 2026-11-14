@@ -25,7 +25,7 @@ The first implementation task is scaffolding:
 - Create the backend package structure.
 - Define API routes and Pydantic schemas.
 - Define service and algorithm interfaces.
-- Add configuration and database placeholders.
+- Add configuration and static data file placeholders.
 - Add health checks, Docker setup, and basic tests.
 - Ensure the API starts without downloaded datasets.
 

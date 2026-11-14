@@ -14,7 +14,7 @@ Offline ingestion and preprocessing
           |
           +----> Raster files / processed data products
           |
-          +----> PostgreSQL + PostGIS metadata and geometries
+          +----> Static data files metadata and geometries
                          |
                          v
                     FastAPI
@@ -33,7 +33,7 @@ app/
 ├── api/
 │   └── routes/       # HTTP endpoints only
 ├── algorithms/       # A*, terrain cost, risk analysis
-├── database/         # Database setup and repositories
+├── storage/          # Static data file setup and repositories
 ├── models/           # SQLAlchemy models
 ├── schemas/          # Pydantic request and response models
 ├── services/         # Application and domain services
@@ -74,11 +74,11 @@ This is a suggested initial structure. Inspect the existing repository before cr
 
 ### Algorithms
 - Implement reusable computation such as A* and terrain-cost evaluation.
-- Avoid HTTP and database dependencies.
+- Avoid HTTP and storage dependencies.
 - Accept well-defined data structures and return computation results.
 
-### Database
-- Own SQLAlchemy configuration, models, and repository/data-access code.
+### Storage
+- Own static data file configuration and repository.
 - Do not assume a final Mars spatial reference identifier until it has been selected and validated.
 
 ### Scripts and data

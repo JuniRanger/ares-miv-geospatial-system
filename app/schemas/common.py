@@ -23,7 +23,7 @@ class HealthResponse(BaseModel):
 
     status: Literal["ok"]
     api_version: str
-    database_status: Literal["not_checked"]
+    storage_status: Literal["not_checked"] = "not_checked"
 
 
 class WarningInfo(BaseModel):

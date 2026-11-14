@@ -43,8 +43,6 @@ Use the following technologies:
 - FastAPI
 - Pydantic v2
 - SQLAlchemy 2.x
-- PostgreSQL
-- PostGIS
 - NumPy
 - Rasterio
 - GDAL
@@ -94,15 +92,14 @@ Location: `app/algorithms/`
 - Implement A* pathfinding.
 - Implement terrain cost calculations.
 - Implement risk analysis.
-- Keep algorithms independent of FastAPI and database concerns.
+- Keep algorithms independent of FastAPI and storage concerns.
 
-### Database
-Location: `app/database/`
+### Storage
+Location: `app/storage/`
 
-- Manage database configuration and sessions.
-- Implement repositories and data access.
-- Use SQLAlchemy 2.x.
-- Prepare PostGIS integration without assuming an unverified Mars SRID.
+- Manage static data file configuration and sessions.
+- Implement repository and data access for static files.
+- Use file-based storage without assuming an unverified Mars data path.
 
 ### Models
 Location: `app/models/`
@@ -172,7 +169,7 @@ Keep coordinate conversion logic centralized and documented.
 - Use explicit Pydantic request and response models.
 - Use appropriate HTTP status codes.
 - Keep endpoints small and readable.
-- Do not expose internal database models directly.
+- Do not expose internal data models directly.
 - Do not return large raw raster arrays inside JSON.
 - Use GeoJSON for geographic geometries.
 - Use PNG or appropriate image formats for visual raster products.

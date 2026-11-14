@@ -1,1 +1,1 @@
-"""Database configuration and access."""
+"""Storage configuration and access."""

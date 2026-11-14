@@ -13,7 +13,7 @@ class Settings(BaseSettings):
 
     api_prefix: str = "/api"
     api_version: str = "0.1.0"
-    database_url: str = "postgresql+psycopg://localhost/martian_route_planner"
+    data_file_path: Path = BACKEND_DIR / "data" / "static" / "layers.json"
     visual_data_dir: Path = BACKEND_DIR / "data" / "visual"
 
     model_config = SettingsConfigDict(

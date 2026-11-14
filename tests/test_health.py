@@ -8,14 +8,14 @@ client = TestClient(app)
 
 
 def test_health_returns_api_status_without_database_check() -> None:
-    """Health remains available without requiring a database connection."""
+    """Health remains available without requiring a storage connection."""
     response = client.get("/api/health")
 
     assert response.status_code == 200
     assert response.json() == {
         "status": "ok",
         "api_version": "0.1.0",
-        "database_status": "not_checked",
+        "storage_status": "not_checked",
     }
 
 

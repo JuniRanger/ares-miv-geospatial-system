@@ -1,16 +1,22 @@
-"""Persistence model for a validated data-layer record."""
+"""Data model for a validated data-layer record."""
 
-from sqlalchemy import Boolean, String
-from sqlalchemy.orm import Mapped, mapped_column
-
-from app.database.connection import Base
+from typing import Optional
 
 
-class Layer(Base):
+class Layer:
     """Metadata record for a data layer; no Mars SRID is assumed."""
 
-    __tablename__ = "layers"
+    def __init__(
+        self,
+        id: str,
+        name: str,
+        available: bool = False,
+    ) -> None:
+        self.id = id
+        self.name = name
+        self.available = available
 
-    id: Mapped[str] = mapped_column(String(100), primary_key=True)
-    name: Mapped[str] = mapped_column(String(255), nullable=False)
-    available: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+
+def create_layer(id: str, name: str, available: bool = False) -> Layer:
+    """Create a layer instance."""
+    return Layer(id=id, name=name, available=available)

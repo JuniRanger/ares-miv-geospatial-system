@@ -6,7 +6,7 @@ intentionally not implemented; the API does not fabricate measurements or routes
 
 ## Technology stack
 
-Python 3.12, FastAPI, Pydantic v2, SQLAlchemy 2.x, PostgreSQL/PostGIS, NumPy,
+Python 3.12, FastAPI, Pydantic v2, SQLAlchemy 2.x, NumPy,
 Rasterio, GeoPandas, Shapely, Pytest, and HTTPX.
 
 ## Project structure
@@ -30,9 +30,9 @@ source .venv/bin/activate
 python -m pip install -r requirements.txt
 ```
 
-Set `DATABASE_URL` if a PostgreSQL connection is needed. The API does not connect
-to the database during startup, so it can also run while PostgreSQL is unavailable.
-The default URL targets a local PostgreSQL service and does not include credentials.
+Set `DATA_FILE_PATH` if a static data file path is needed. The API reads
+configuration from static files in memory, so it can also run without a database.
+The default reads from static data files bundled with the application.
 
 Start the API:
 
@@ -45,9 +45,9 @@ is available at `http://127.0.0.1:8000/docs`.
 
 ## Environment configuration
 
-Copy `.env.example` to `.env` and update its development-only PostgreSQL credentials
+Copy `.env.example` to `.env` and update its development-only data file path
 before using Docker Compose. Available settings include `API_PREFIX`, `API_VERSION`,
-`DATABASE_URL`, and `VISUAL_DATA_DIR`. Do not commit `.env` or real credentials.
+`DATA_FILE_PATH`, and `VISUAL_DATA_DIR`. Do not commit `.env` or real credentials.
 
 ## Docker
 
@@ -58,8 +58,8 @@ cp .env.example .env
 docker compose up --build
 ```
 
-The Compose stack starts the API and PostgreSQL/PostGIS. The API container is not
-blocked on a successful database health check. The Docker image installs GDAL's
+The Compose stack starts the API. The API container is not
+blocked on a successful data file health check. The Docker image installs GDAL's
 system utilities and development libraries; Rasterio and GeoPandas are installed
 from their Python package dependencies.
 

@@ -20,14 +20,14 @@ async def plan_route(request: RoutePlanRequest) -> RouteResponse:
     )
 
 
-@router.get("/{route_id}", response_model=RouteResponse)
-async def get_route(route_id: str) -> RouteResponse:
-    """Return 404 because no route persistence or route records exist yet."""
-    del route_id
-    raise HTTPException(
-        status_code=404,
-        detail={
-            "code": "RESOURCE_NOT_FOUND",
-            "message": "The requested route was not found.",
-        },
-    )
+# @router.get("/{route_id}", response_model=RouteResponse)
+# async def get_route(route_id: str) -> RouteResponse:
+#     """Return 404 because no route persistence or route records exist yet."""
+#     del route_id
+#     raise HTTPException(
+#         status_code=404,
+#         detail={
+#             "code": "RESOURCE_NOT_FOUND",
+#             "message": "The requested route was not found.",
+#         },
+#     )
