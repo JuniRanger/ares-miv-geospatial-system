@@ -25,32 +25,3 @@ class GeoJSONFeatureCollection(BaseModel):
 
     type: Literal["FeatureCollection"] = "FeatureCollection"
     features: list[GeoJSONFeature]
-
-
-class SiteGrid(BaseModel):
-    """Master grid metadata for the configured study area."""
-
-    resolution_m: float
-    width_cells: int
-    height_cells: int
-    coordinate_reference_system: str
-
-
-class SiteDEM(BaseModel):
-    """Provenance and range metadata for the site's elevation product."""
-
-    source: str
-    source_resolution_m: float
-    elevation_min_m: float | None
-    elevation_max_m: float | None
-
-
-class SiteResponse(BaseModel):
-    """Study-area response defined by the API contract."""
-
-    site_id: str
-    name: str
-    bbox: tuple[float, float, float, float]
-    grid: SiteGrid
-    dem: SiteDEM
-    science_stops: GeoJSONFeatureCollection

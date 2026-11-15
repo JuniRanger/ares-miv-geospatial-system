@@ -107,18 +107,18 @@ Never cut: the coordinate acceptance test, slope-based A*, `data_quality`, and h
 
 ## Definition of Done for the initial scaffold
 
-- [x] Application starts locally.
-- [x] Health endpoint returns a valid response with per-dataset status.
-- [x] All planned route modules are registered, including `/site`, `/mars/traverse/curiosity` and `/mars/images/near`.
-- [x] Request and response schemas are defined (Pydantic v2) and match `API_CONTRACTS.md`.
-- [x] Unimplemented functionality returns an honest status such as 501.
-- [x] Missing static data files do not prevent application startup.
-- [x] Environment variables are documented.
-- [x] CORS is enabled for the frontend origin.
+- [ ] Application starts locally.
+- [ ] Health endpoint returns a valid response with per-dataset status.
+- [ ] All planned route modules are registered, including `/site`, `/mars/traverse/curiosity` and `/mars/images/near`.
+- [ ] Request and response schemas are defined (Pydantic v2) and match `API_CONTRACTS.md`.
+- [ ] Unimplemented functionality returns an honest status such as 501.
+- [ ] Missing static data files do not prevent application startup.
+- [ ] Environment variables are documented.
+- [ ] CORS is enabled for the frontend origin.
 - [ ] Docker Compose can start the API without a database.
-- [x] `database_status` reports `"disabled"`.
-- [x] Basic tests pass.
-- [x] No fabricated scientific data is returned.
+- [ ] `database_status` reports `"disabled"`.
+- [ ] Basic tests pass.
+- [ ] No fabricated scientific data is returned.
 
 ## Definition of Done for the demo
 

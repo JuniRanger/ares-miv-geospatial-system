@@ -175,67 +175,110 @@ Every field name carries its unit as a suffix: `_m` meters, `_min` minutes, `_de
 
 ```json
 {
-  "origin": { "latitude": -4.8149309421, "longitude": 137.3720378680 },
-  "destination": { "latitude": -4.8221853022, "longitude": 137.3634338595 },
-  "max_km": 5.0,
-  "descanso_min": 10,
-  "velocidad_ms": 0.7,
-  "pendiente_max_deg": 12
+  "origin": { "latitude": -4.8150, "longitude": 137.3720 },
+  "destination": { "latitude": -4.8260, "longitude": 137.3889 },
+  "waypoints": [
+    { "latitude": -4.8201, "longitude": 137.3801, "stop_id": "boxwork-01", "stop_duration_min": 20 }
+  ],
+  "profile": "eva_walk",
+  "constraints": {
+    "max_slope_deg": 15,
+    "max_distance_m": 5000,
+    "max_duration_min": 240,
+    "must_return_to_origin": false
+  },
+  "preferences": {
+    "avoid_rough_terrain": true,
+    "consider_thermal_data": true,
+    "minimize_radiation": false
+  }
 }
 ```
 
 | Field | Type | Required | Default | Notes |
 |---|---|---|---|---|
 | `origin`, `destination` | `{latitude, longitude}` | yes | — | |
-| `max_km` | float `(0, 10]` | no | 5.0 | Maximum route length and direct-distance limit |
-| `descanso_min` | float > 0 | no | 10 | Rest duration at each suggested stop |
-| `velocidad_ms` | float `(0, 1.0]` | no | 0.7 | Nominal walking speed for a suited human |
-| `pendiente_max_deg` | float `(0, 20]` | no | 12 | Steeper cells are impassable |
+| `waypoints` | list (max 10) | no | `[]` | Science stops, visited **in the given order** |
+| `waypoints[].stop_id` | string | no | `null` | Id from `/site` if it is a known stop |
+| `waypoints[].stop_duration_min` | int ≥ 0 | no | `0` | Work time at the stop |
+| `profile` | `"eva_walk"` \| `"rover"` | no | `"eva_walk"` | Changes speed and default limits |
+| `constraints.max_slope_deg` | float `(0, 45]` | no | 15 (eva) / 25 (rover) | Steeper = **forbidden** |
+| `constraints.max_distance_m` | float > 0 | no | 5000 | If exceeded → `NO_FEASIBLE_ROUTE` |
+| `constraints.max_duration_min` | float > 0 | no | 240 | Includes stops |
+| `constraints.must_return_to_origin` | bool | no | `false` | Adds and counts the return trip |
+| `preferences.avoid_rough_terrain` | bool | no | `true` | Penalizes high roughness |
+| `preferences.consider_thermal_data` | bool | no | `true` | Penalizes low thermal inertia if data exists |
+| `preferences.minimize_radiation` | bool | no | `false` | Penalizes high estimated dose |
 
-This endpoint models **one suited human walking**, not a rover. `max_km` limits
-route length; it is distinct from the GeoTIFF's geographic coverage radius.
-Walking speed reduction with slope and rest duration are modeling assumptions,
-not validated Mars EVA measurements.
+Default limits (15°, 5 km, 240 min) are **design parameters to be calibrated**, not NASA standards. They live in backend configuration.
 
 ## Route response shape
 
-Response fields are calculated from the requested route and the configured slope raster.
+This is a contract illustration, not a real route result. Do not return `completed` with fabricated route data. The final response model may evolve as implementation decisions are made.
 
 ```json
 {
-  "distancia_km": 3.0,
-  "resolucion_m": 5.0,
-  "pendiente_max_en_ruta_deg": 0.0,
-  "puntos": [[137.3720, -4.8150], [137.3731, -4.8158]],
-  "tramos": [
-    { "tramo": 1, "km": 1.1, "horas_caminando": 0.44,
-      "parada": { "lon": 137.3760, "lat": -4.8190, "km_acumulado": 1.1 } },
-    { "tramo": 2, "km": 1.2, "horas_caminando": 0.48,
-      "parada": { "lon": 137.3810, "lat": -4.8220, "km_acumulado": 2.3 } },
-    { "tramo": 3, "km": 0.7, "horas_caminando": 0.28, "parada": null }
+  "route_id": "example-route-id",
+  "status": "completed",
+  "profile": "eva_walk",
+  "risk_level": "moderate",
+  "geometry": {
+    "type": "LineString",
+    "coordinates": [[137.3720, -4.8150, -3501.2], [137.3731, -4.8158, -3498.7]]
+  },
+  "metrics": {
+    "distance_m": null,
+    "elevation_gain_m": null,
+    "elevation_loss_m": null,
+    "max_slope_deg": null,
+    "mean_slope_deg": null,
+    "est_walking_time_min": null,
+    "est_total_time_min": null,
+    "est_radiation_dose_mgy": null
+  },
+  "elevation_profile": [
+    { "distance_m": 0.0, "latitude": -4.8150, "longitude": 137.3720, "elevation_m": -3501.2, "slope_deg": 2.1 }
   ],
-  "tiempo_caminando_h": 1.2,
-  "tiempo_descanso_h": 0.33,
-  "tiempo_total_h": 1.53,
-  "supuestos": [
-    "Modelo: persona caminando con traje espacial, no rover.",
-    "La velocidad máxima nominal se basa en Apolo: 3,5 km/h medidos en la Luna.",
-    "La velocidad por defecto, la duración del descanso y la reducción por pendiente son supuestos del modelo.",
-    "La pendiente máxima se extrapola de pruebas de la NASA con traje (~11°) y no está validada.",
-    "La pendiente proviene del DEM a 5 m; no es la inclinación real bajo el traje.",
-    "No hay mediciones de caminata con traje presurizado en gravedad marciana."
-  ]
+  "stops": [
+    { "stop_id": "boxwork-01", "distance_m": 1290.0, "arrival_min": 39 }
+  ],
+  "warnings": [
+    {
+      "code": "STEEP_SLOPE",
+      "severity": "warning",
+      "message": "Slope of 13.7° over 40 m, close to the 15° limit.",
+      "latitude": -4.8203,
+      "longitude": 137.3802,
+      "distance_m": 1210.0,
+      "length_m": 40.0
+    }
+  ],
+  "data_quality": {
+    "elevation": "available",
+    "slope": "available",
+    "roughness": "available",
+    "thermal": "unavailable",
+    "radiation": "estimated"
+  },
+  "computation": {
+    "grid_resolution_m": 5.0,
+    "nodes_expanded": null,
+    "elapsed_ms": null,
+    "layers_used": ["elevation_m", "slope_deg", "roughness_m", "radiation_mgy_day"],
+    "layers_unavailable": ["thermal_inertia"]
+  }
 }
 ```
 
 Rules:
 
-- `puntos` contains `[longitude, latitude]` coordinates in route order.
-- Rest stops are suggestions on the calculated path and do not alter its geometry.
-- A stop is selected at the minimum slope between 1.0 and 1.5 km from the previous stop or origin; the destination is never a stop.
-- `horas_caminando` uses `v = velocidad_ms * max(0.2, 1 - pendiente_local / 20)` at each step.
-- `tiempo_descanso_h` is the number of stops multiplied by `descanso_min / 60`.
-- The example is illustrative; the returned route values are computed from the selected raster.
+- `geometry.coordinates`: simplified (max ~2,000 vertices), with elevation when available.
+- `elevation_profile`: one sample **every 10 m** of route. `distance_m` is the chart's X axis.
+- Every `warning` carries a **position** (`latitude`/`longitude`) **and** `distance_m`. `length_m` is optional (stretch alerts).
+- `metrics.est_radiation_dose_mgy` is `null` if no model is available.
+- `risk_level`: `"low"` | `"moderate"` | `"high"` | `"unknown"`, derived from `warnings`.
+- `data_quality.*`: `"available"` | `"partial"` | `"unavailable"` | `"estimated"`.
+- `computation.layers_used` / `layers_unavailable` list the `layer_id`s from the registry that took part or were missing.
 
 `warnings[].code` values:
 
@@ -253,9 +296,11 @@ Infeasible route error:
 
 ```json
 {
-  "code": "NO_FEASIBLE_ROUTE",
-  "message": "No route exists with slopes ≤ 15°. The minimum possible needs 19.2°.",
-  "details": { "blocking_constraint": "max_slope_deg", "min_required": 19.2 }
+  "error": {
+    "code": "NO_FEASIBLE_ROUTE",
+    "message": "No route exists with slopes ≤ 15°. The minimum possible needs 19.2°.",
+    "details": { "blocking_constraint": "max_slope_deg", "min_required": 19.2 }
+  }
 }
 ```
 

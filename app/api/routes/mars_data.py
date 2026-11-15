@@ -7,18 +7,16 @@ from fastapi import APIRouter, HTTPException, Path as PathParameter
 from fastapi.responses import FileResponse
 
 from app.config import settings
-from app.schemas.common import ErrorResponse, LayerListResponse, LayerMetadata
-from app.schemas.mars import GeoJSONFeatureCollection, SiteResponse
+from app.schemas.common import LayerListResponse, LayerMetadata
 
 router = APIRouter(prefix="/mars", tags=["Mars data"])
 
 _PLANNED_LAYERS = (
-    ("elevation_m", "Elevation", "Planned elevation layer.", "topographic", "cost"),
-    ("slope_deg", "Slope", "Planned slope layer.", "derived", "cost"),
-    ("roughness_m", "Roughness", "Planned terrain roughness layer.", "derived", "cost"),
-    ("thermal_inertia", "Thermal inertia", "Planned thermal layer.", "thermal", "cost"),
-    ("radiation_mgy_day", "Radiation", "Planned radiation layer.", "radiation", "cost"),
-    ("geology", "Geology", "Planned geology layer.", "geologic", "display"),
+    ("elevation", "Elevation", "Planned elevation layer."),
+    ("slope", "Slope", "Planned slope layer."),
+    ("roughness", "Roughness", "Planned terrain roughness layer."),
+    ("thermal", "Thermal", "Planned thermal layer."),
+    ("geology", "Geology", "Planned geology layer."),
 )
 
 
@@ -41,21 +39,18 @@ async def list_layers() -> LayerListResponse:
             layer_id=layer_id,
             name=name,
             description=f"{description} No dataset has been validated for this layer.",
-            category=category,
-            role=role,
-            quality="unavailable",
             available=False,
             source=None,
             units=None,
             spatial_resolution=None,
             coordinate_reference_system=None,
         )
-        for layer_id, name, description, category, role in _PLANNED_LAYERS
+        for layer_id, name, description in _PLANNED_LAYERS
     ]
     return LayerListResponse(layers=layers)
 
 
-@router.get("/texture", responses={404: {"model": ErrorResponse}})
+@router.get("/texture")
 async def get_texture() -> FileResponse:
     """Serve the generated global texture when it exists."""
     texture_path = settings.visual_data_dir / "mars_texture.png"
@@ -64,7 +59,7 @@ async def get_texture() -> FileResponse:
     return FileResponse(texture_path, media_type="image/png")
 
 
-@router.get("/layers/{layer_id}/raster", responses={404: {"model": ErrorResponse}})
+@router.get("/layers/{layer_id}/raster")
 async def get_layer_raster(
     layer_id: Annotated[str, PathParameter(min_length=1)],
 ) -> FileResponse:
@@ -90,7 +85,7 @@ async def get_layer_raster(
     return FileResponse(raster_path, media_type="image/png")
 
 
-@router.get("/layers/{layer_id}/data", responses={503: {"model": ErrorResponse}})
+@router.get("/layers/{layer_id}/data")
 async def get_layer_data(
     layer_id: Annotated[str, PathParameter(min_length=1)],
 ) -> None:
