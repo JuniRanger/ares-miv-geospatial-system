@@ -45,6 +45,7 @@ The core workflow is: **elevation data → slope → cost grid → A\* → GeoJS
 - Run A* in a thread (`run_in_threadpool`) if it takes more than 1–2 s.
 - Convert the resulting path into GeoJSON.
 - Return `metrics`, `elevation_profile` (every 10 m), `stops`, `data_quality` and `computation` (`layers_used`, `layers_unavailable`).
+- Include AND thermal/epithermal neutron counts as an optional regional reference (5° cells, counts/s, source and period); do not treat them as human dose or use them as an A* cost.
 - Return `NO_FEASIBLE_ROUTE` with `details.blocking_constraint` when no route satisfies the constraints; never return `completed` with fabricated data.
 - Keep calculated routes in memory and expose `GET /routes/{route_id}` (max ~100 routes).
 - Validate: compare DEM-derived slope with the `tilt_deg` Curiosity measured at its waypoints.

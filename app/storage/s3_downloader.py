@@ -4,7 +4,7 @@ import base64
 from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime, timezone
-import fcntl
+import errno
 import hashlib
 import json
 import logging
@@ -13,7 +13,13 @@ import os
 from pathlib import Path
 import re
 import tempfile
+import time
 from typing import Literal
+
+if os.name == "nt":
+    import msvcrt
+else:
+    import fcntl
 
 import boto3
 from botocore.config import Config
@@ -456,12 +462,32 @@ def _safe_error_code(error: Exception) -> str:
 
 @contextmanager
 def _destination_lock(target_path: Path):
-    """Serialize refreshes across threads and processes on the Render instance."""
+    """Serializar actualizaciones entre procesos en Windows, Linux y macOS."""
     lock_path = target_path.with_name(f"{target_path.name}.lock")
     descriptor = os.open(lock_path, os.O_CREAT | os.O_RDWR, 0o600)
+    locked = False
     try:
-        fcntl.flock(descriptor, fcntl.LOCK_EX)
+        if os.name == "nt":
+            if os.fstat(descriptor).st_size == 0:
+                os.write(descriptor, b"\0")
+            while True:
+                os.lseek(descriptor, 0, os.SEEK_SET)
+                try:
+                    msvcrt.locking(descriptor, msvcrt.LK_NBLCK, 1)
+                    break
+                except OSError as error:
+                    if error.errno not in (errno.EACCES, errno.EAGAIN, errno.EDEADLK):
+                        raise
+                    time.sleep(0.1)
+        else:
+            fcntl.flock(descriptor, fcntl.LOCK_EX)
+        locked = True
         yield
     finally:
-        fcntl.flock(descriptor, fcntl.LOCK_UN)
+        if locked:
+            if os.name == "nt":
+                os.lseek(descriptor, 0, os.SEEK_SET)
+                msvcrt.locking(descriptor, msvcrt.LK_UNLCK, 1)
+            else:
+                fcntl.flock(descriptor, fcntl.LOCK_UN)
         os.close(descriptor)

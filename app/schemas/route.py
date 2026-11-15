@@ -86,6 +86,42 @@ class Tramo(BaseModel):
     parada: Parada | None = Field(description="Parada al final del tramo; null para el tramo final.")
 
 
+class ZonaNeutrones(BaseModel):
+    """Tasas de neutrones medidas en una celda regional del producto AND."""
+
+    latitud_centro_areocentrica_deg: float
+    longitud_centro_este_deg: float
+    celdas_vecinas_disponibles: int
+    termicos_cuentas_s: float | None
+    termicos_desviacion_cuentas_s: float | None
+    termicos_intervalos: int | None
+    termicos_media_vecinos_cuentas_s: float | None
+    termicos_diferencia_vecinos_pct: float | None
+    epitermicos_cuentas_s: float | None
+    epitermicos_desviacion_cuentas_s: float | None
+    epitermicos_intervalos: int | None
+    epitermicos_media_vecinos_cuentas_s: float | None
+    epitermicos_diferencia_vecinos_pct: float | None
+
+
+class ReferenciaNeutrones(BaseModel):
+    """Referencia regional de conteos; no representa dosis de radiación humana."""
+
+    estado: Literal["available", "partial", "unavailable"]
+    fuente: str
+    producto_id: str
+    fecha_inicio_utc: str
+    fecha_fin_utc: str
+    longitud_solar_inicio_deg: float
+    longitud_solar_fin_deg: float
+    resolucion_espacial_deg: tuple[float, float]
+    unidad: Literal["cuentas/s"]
+    es_dosis: Literal[False] = False
+    usada_por_astar: Literal[False] = False
+    mensaje: str
+    zonas: list[ZonaNeutrones]
+
+
 class RouteResponse(BaseModel):
     """JSON response with route geometry, stages, timings and assumptions."""
 
@@ -98,3 +134,6 @@ class RouteResponse(BaseModel):
     tiempo_descanso_h: float = Field(description="Tiempo total de descanso en horas.")
     tiempo_total_h: float = Field(description="Suma de caminata y descansos en horas.")
     supuestos: list[str] = Field(description="Supuestos científicos y de movimiento del modelo.")
+    referencia_neutrones: ReferenciaNeutrones = Field(
+        description="Contexto regional de neutrones; no es dosis ni modifica la ruta."
+    )

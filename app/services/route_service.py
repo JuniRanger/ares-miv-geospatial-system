@@ -17,6 +17,7 @@ from app.config import (
     settings,
 )
 from app.schemas.route import Parada, PeticionRuta, RouteResponse, Tramo
+from app.services.neutron_reference_service import get_route_neutron_reference
 from app.storage.slope_raster import (
     SlopeRasterValidationError,
     validate_slope_dataset,
@@ -163,6 +164,7 @@ def plan_route(request: PeticionRuta) -> RouteResponse:
             _xy_to_lonlat(*dataset.xy(row, col), projection, radius_m)
             for row, col in global_path
         ]
+        neutron_reference = get_route_neutron_reference(points)
         stop_indices = _select_rest_stops(cumulative_m, route_slopes)
         segments = _build_segments(
             stop_indices,
@@ -184,6 +186,7 @@ def plan_route(request: PeticionRuta) -> RouteResponse:
         tiempo_descanso_h=resting_hours,
         tiempo_total_h=walking_hours + resting_hours,
         supuestos=_model_assumptions(),
+        referencia_neutrones=neutron_reference,
     )
 
 
