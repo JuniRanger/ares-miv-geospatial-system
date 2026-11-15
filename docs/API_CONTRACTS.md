@@ -9,7 +9,7 @@ This document describes the REST API contract (v1.1). During scaffolding, create
 ## Architecture notes
 
 - The backend is Python (FastAPI). Route planning (A*) runs on the backend over a pre-built **cost stack** (see "Data contract").
-- Heavy rasters live in a **static data store** (S3 or any static host), not in Git. The backend downloads what it needs at startup into local disk and loads it into memory.
+- Heavy rasters live in a **static data store** (S3 or any static host), not in Git. The backend refreshes its local cache in a background task during startup; route requests read only the raster window they need.
 - **No database in v1.** Saved routes are kept in memory (max ~100, oldest evicted). `app/database/` and `app/models/` are kept but not imported from `main.py`.
 - **Image tiles** (HiRISE, CTX, THEMIS…) are requested by the frontend directly from NASA Trek or the data store. Do not add a tile-server endpoint unless the team explicitly chooses to implement it.
 
@@ -24,7 +24,7 @@ This document describes the REST API contract (v1.1). During scaffolding, create
 | GET | `/mars/traverse/curiosity` | Curiosity traverse clipped to the study area | Return 501 until implemented |
 | GET | `/mars/images/near` | Curiosity raw images near a coordinate | Return 501 until implemented |
 | GET | `/mars/layers/{layer_id}/raster` | Retrieve a backend-generated raster visualization | Return 404 if the requested generated file does not exist |
-| POST | `/routes/plan` | Request a route | Return 501 until route planning is implemented |
+| POST | `/routes/plan` | Request a route | Calculate a pedestrian route over the slope raster. Returns 200 with route geometry, metrics, and rest stops, or an error code (see "Route response shape" and error code table). |
 | GET | `/routes/{route_id}` | Retrieve a calculated route (in memory) | Return 404 when no such route exists |
 
 Removed from the previous version: `/mars/texture`, `/mars/elevation` (merged into `/mars/terrain`) and `/mars/layers/{layer_id}/data`.
@@ -81,7 +81,7 @@ Every field name carries its unit as a suffix: `_m` meters, `_min` minutes, `_de
   "status": "ok",
   "api_version": "1.1.0",
   "datasets": {
-    "cost_stack": "available",
+    "slope_raster": "available",
     "science_stops": "available",
     "curiosity_traverse": "available"
   },
@@ -96,7 +96,7 @@ Every field name carries its unit as a suffix: `_m` meters, `_min` minutes, `_de
 }
 ```
 
-- `status`: `"ok"` or `"degraded"`. If the cost stack is missing, return `degraded` with HTTP 503.
+- `status`: `"ok"` or `"degraded"`. If the configured slope raster is missing or invalid, return `degraded` with HTTP 503.
 - `datasets.*`: `"available"` | `"unavailable"`.
 - `layers.*`: `"available"` | `"partial"` | `"estimated"` | `"unavailable"` (taken from the layer registry).
 

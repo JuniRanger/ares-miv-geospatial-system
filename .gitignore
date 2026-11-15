@@ -65,6 +65,9 @@ htmlcov/
 # --- Rasters de producción local ---
 data/processed/*.tif
 data/processed/*.tiff
+data/processed/*.part
+data/processed/*.lock
+data/processed/*.manifest.json
 map_mart/*.tif
 map_mart/*.tiff
 map_mart/*.tif.aux.xml

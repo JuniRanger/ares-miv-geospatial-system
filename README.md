@@ -6,8 +6,8 @@ data services remain pending and the API does not fabricate measurements.
 
 ## Technology stack
 
-Python 3.12, FastAPI, Pydantic v2, SQLAlchemy 2.x, NumPy,
-Rasterio, GeoPandas, Shapely, Pytest, and HTTPX.
+Python 3.12, FastAPI, Pydantic v2, boto3, SQLAlchemy 2.x, NumPy,
+Rasterio, GeoPandas, Shapely, Docker Compose, Pytest, and HTTPX.
 
 ## Project structure
 
@@ -31,9 +31,17 @@ python -m pip install -r requirements.txt
 ```
 
 Copy `.env.example` to `.env` and set `RUTA_PENDIENTE` to the 5 m slope GeoTIFF
-in `map_mart/slope_5m.tif`.
-The API can start without raster products or a database; route planning returns
-503 until the configured raster is present.
+cache path (default: `./data/processed/slope_5m.tif`). Configure the S3 bucket
+and key to allow the API to populate this cache in the background. The API can
+start without AWS credentials or an available raster; route planning returns
+503 until a valid local raster is present.
+
+To fetch or refresh the raster manually:
+
+```bash
+python scripts/fetch_route_raster.py
+python scripts/fetch_route_raster.py --force
+```
 
 Start the API:
 
@@ -50,9 +58,12 @@ The health endpoint is `http://127.0.0.1:8000/api/v1/health`, route planning is
 Docker Compose starts with defaults; copy `.env.example` to `.env` only when
 overriding them. Available settings include `API_PREFIX`, `API_VERSION`,
 `CORS_ORIGINS`, `DATA_LOCAL_DIR`, `RUTA_PENDIENTE`, `DATA_FILE_PATH`, and
-`VISUAL_DATA_DIR`. `RUTA_PENDIENTE` selects the 5 m slope GeoTIFF and is opened
-only when a route is requested. `CORS_ORIGINS` is a comma-separated list and
-defaults to `http://localhost:5173`. Do not commit `.env` or credentials.
+`VISUAL_DATA_DIR`, plus `S3_BUCKET`, `S3_KEY`, `S3_REGION`, optional
+`S3_VERSION_ID` and `S3_SHA256`, and optional AWS credentials. Without explicit
+keys, boto3 uses its standard credential chain. `RUTA_PENDIENTE` selects the
+5 m slope GeoTIFF; it is validated during startup and opened for each route.
+`CORS_ORIGINS` is a comma-separated list and defaults to
+`http://localhost:5173`. Do not commit `.env` or credentials.
 
 ## Docker
 
@@ -62,10 +73,10 @@ From this directory:
 docker compose up --build
 ```
 
-The Compose stack starts only the API; no database container is required. Missing
-datasets make `/api/v1/health` return `503` with `status: "degraded"`, but do not
-prevent the application from starting. Rasterio and GeoPandas are installed from
-their Python package dependencies.
+The Compose stack starts the API with a writable raster-cache directory; no
+database container is required. Missing datasets make `/api/v1/health` return
+`503` with `status: "degraded"`, but do not prevent the application from
+starting. Rasterio and GeoPandas are installed from their Python dependencies.
 
 ## Tests
 

@@ -12,12 +12,15 @@ from app.algorithms.astar import ExpansionLimitExceeded, find_path
 from app.config import (
     PEND_REF,
     PEND_TOPE,
-    RUTA_PENDIENTE,
     TRAMO_MAX_KM,
     TRAMO_MIN_KM,
     settings,
 )
 from app.schemas.route import Parada, PeticionRuta, RouteResponse, Tramo
+from app.storage.slope_raster import (
+    SlopeRasterValidationError,
+    validate_slope_dataset,
+)
 
 
 @dataclass
@@ -32,7 +35,7 @@ class RoutePlanningError(Exception):
 
 def plan_route(request: PeticionRuta) -> RouteResponse:
     """Calcular una ruta humana y sus descansos a partir de un GeoTIFF."""
-    raster_path = Path(settings.ruta_pendiente or RUTA_PENDIENTE)
+    raster_path = Path(settings.ruta_pendiente)
     if not raster_path.is_file():
         raise RoutePlanningError(
             503,
@@ -40,26 +43,23 @@ def plan_route(request: PeticionRuta) -> RouteResponse:
             f"No se encontró el raster de pendiente configurado: {raster_path}",
         )
 
-    with rasterio.open(raster_path) as dataset:
-        if dataset.crs is None:
+    try:
+        slope_dataset = rasterio.open(raster_path)
+    except (OSError, rasterio.errors.RasterioError) as error:
+        raise RoutePlanningError(
+            503, "INVALID_DATASET", "No se pudo abrir el raster de pendiente."
+        ) from error
+
+    with slope_dataset as dataset:
+        try:
+            validate_slope_dataset(dataset)
+        except SlopeRasterValidationError as error:
             raise RoutePlanningError(
-                503, "INVALID_DATASET", "El raster de pendiente no declara un CRS."
-            )
+                503, "INVALID_DATASET", str(error)
+            ) from error
         projection = dataset.crs.to_dict()
-        if projection.get("proj") != "eqc":
-            raise RoutePlanningError(
-                503,
-                "INVALID_DATASET",
-                "El raster debe usar una proyección equirectangular esférica.",
-            )
 
         radius_m = float(projection.get("R", projection.get("a", 0.0)))
-        if radius_m <= 0:
-            raise RoutePlanningError(
-                503,
-                "INVALID_DATASET",
-                "El CRS del raster no declara el radio de la esfera de Marte.",
-            )
         origin_xy = _lonlat_to_xy(request.origin.longitude, request.origin.latitude, projection, radius_m)
         destination_xy = _lonlat_to_xy(
             request.destination.longitude,

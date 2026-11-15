@@ -1,20 +1,55 @@
 """FastAPI application factory and API router registration."""
 
+import asyncio
+from contextlib import asynccontextmanager
 import logging
+from typing import AsyncIterator
 
-from app.api.routes import health, mars_data, route_planner, stubs
 from fastapi import FastAPI, Request
+from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
-from fastapi.encoders import jsonable_encoder
-from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import terrain
+from app.api.routes import health, mars_data, route_planner, stubs, terrain
 from app.config import settings
 from app.schemas.common import ErrorDetail, ErrorResponse
+from app.storage.s3_downloader import ensure_slope_raster
+from app.storage.slope_raster import is_valid_slope_raster
 
 logger = logging.getLogger(__name__)
+
+
+async def _prepare_slope_dataset(application: FastAPI) -> None:
+    """Refresh the local raster cache outside the event loop."""
+    try:
+        result = await asyncio.to_thread(ensure_slope_raster)
+        application.state.slope_dataset_available = result.available
+        if not result.available:
+            logger.warning(
+                "El raster de pendiente no está disponible (%s).",
+                result.error_code or result.status,
+            )
+    except Exception as error:
+        application.state.slope_dataset_available = False
+        logger.error(
+            "Falló la preparación del raster durante el inicio (%s).",
+            type(error).__name__,
+        )
+
+
+@asynccontextmanager
+async def lifespan(application: FastAPI) -> AsyncIterator[None]:
+    """Start the API immediately and refresh the dataset asynchronously."""
+    application.state.slope_dataset_available = is_valid_slope_raster(
+        settings.ruta_pendiente
+    )
+    refresh_task = asyncio.create_task(_prepare_slope_dataset(application))
+    try:
+        yield
+    finally:
+        await refresh_task
 
 
 def create_app() -> FastAPI:
@@ -29,10 +64,15 @@ def create_app() -> FastAPI:
         openapi_url="/openapi.json",
         docs_url="/docs",
         redoc_url="/redoc",
+        lifespan=lifespan,
     )
     application.add_middleware(
         CORSMiddleware,
-        allow_origins=[origin.strip() for origin in settings.cors_origins.split(",") if origin.strip()],
+        allow_origins=[
+            origin.strip()
+            for origin in settings.cors_origins.split(",")
+            if origin.strip()
+        ],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],

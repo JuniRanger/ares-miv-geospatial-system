@@ -26,6 +26,12 @@ Offline ingestion and preprocessing
 
 The ingestion and preprocessing pipeline is planned separately from normal API request handling. API requests should read prepared products rather than repeatedly downloading and processing source datasets.
 
+The route planner's current input is a single-band 5 m slope GeoTIFF. It may be
+cached from S3 to a local writable directory during the FastAPI lifespan; cache
+refresh runs in a worker thread and does not block API startup. Route requests
+open only the required raster window. A* and route-planning behavior are
+independent of this cache mechanism.
+
 ## Suggested package responsibilities
 
 ```text

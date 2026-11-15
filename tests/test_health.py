@@ -3,12 +3,16 @@
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.storage.s3_downloader import DatasetPreparationResult
 
 client = TestClient(app)
 
 
-def test_health_reports_missing_datasets_without_database() -> None:
+def test_health_reports_missing_datasets_without_database(tmp_path, monkeypatch) -> None:
     """Health reports degraded data status while the API remains startable."""
+    from app.config import settings
+
+    monkeypatch.setattr(settings, "ruta_pendiente", tmp_path / "missing-slope.tif")
     response = client.get("/api/v1/health")
 
     assert response.status_code == 503
@@ -17,7 +21,7 @@ def test_health_reports_missing_datasets_without_database() -> None:
     assert body["api_version"] == "1.1.0"
     assert body["database_status"] == "disabled"
     assert set(body["datasets"]) == {
-        "cost_stack",
+        "slope_raster",
         "science_stops",
         "curiosity_traverse",
     }
@@ -56,3 +60,26 @@ def test_missing_datasets_do_not_prevent_startup() -> None:
     assert response.status_code == 200
     assert response.json()["layers"]
     assert all(not layer["available"] for layer in response.json()["layers"])
+
+
+def test_lifespan_starts_when_slope_raster_is_unavailable(monkeypatch, tmp_path) -> None:
+    """A missing cache or remote object does not prevent FastAPI startup."""
+    calls = []
+
+    def unavailable_result():
+        calls.append(True)
+        return DatasetPreparationResult(
+            status="unavailable",
+            available=False,
+            path=tmp_path / "missing.tif",
+            message="No raster is available.",
+        )
+
+    monkeypatch.setattr("app.main.is_valid_slope_raster", lambda _path: False)
+    monkeypatch.setattr("app.main.ensure_slope_raster", unavailable_result)
+
+    with TestClient(app) as startup_client:
+        response = startup_client.get("/api/v1/mars/layers")
+
+    assert response.status_code == 200
+    assert calls == [True]

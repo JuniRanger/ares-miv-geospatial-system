@@ -6,15 +6,24 @@
 
 ## Configuración
 
-La variable `RUTA_PENDIENTE` apunta al GeoTIFF de pendiente, con una banda de valores en grados y celdas de 5 m. Su valor por defecto es `map_mart/slope_5m.tif`. Se puede cambiar en `.env`:
+La variable `RUTA_PENDIENTE` apunta al GeoTIFF de pendiente, con una banda de valores en grados y celdas de 5 m. Su valor por defecto es `data/processed/slope_5m.tif`, derivado de `DATA_LOCAL_DIR`. Se puede cambiar en `.env`:
 
 ```dotenv
-RUTA_PENDIENTE=./map_mart/slope_5m.tif
+DATA_LOCAL_DIR=./data/processed
+RUTA_PENDIENTE=./data/processed/slope_5m.tif
 ```
 
-El GeoTIFF está en `map_mart/slope_5m.tif`; esa carpeta se monta también al contenedor de Docker.
+Al iniciar FastAPI, una tarea en segundo plano valida la caché local y consulta
+el objeto configurado mediante `S3_BUCKET`, `S3_KEY` y `S3_REGION`. Si hace falta,
+descarga el objeto en bloques, valida el GeoTIFF y lo publica de forma atómica.
+El proceso de arranque no espera a S3: si el raster no está disponible todavía,
+la API arranca y las rutas responden `503 DATASET_UNAVAILABLE`. Un raster local
+válido se conserva si S3 falla. `python scripts/fetch_route_raster.py` ejecuta la
+misma preparación manualmente; `--force` solicita descargar de nuevo.
 
-El raster es un dato local pesado y los GeoTIFFs de `map_mart/` están excluidos de Git. No copies el DEM original de 1 m para esta ruta: el endpoint consume el raster de pendiente de 5 m. Si el archivo no existe, el API arranca normalmente y la petición responde `503 DATASET_UNAVAILABLE`.
+No copies el DEM original de 1 m para esta ruta: el endpoint consume el raster
+de pendiente de 5 m. En Render, el directorio local debe ser escribible y puede
+ser efímero; el objeto de S3 debe permanecer como fuente persistente.
 
 El archivo comprobado tiene resolución de 5 m y extensión rectangular de 32,98 × 57,44 km. Un círculo de 10 km de radio alrededor del centro del raster no tenía celdas NoData. `max_km` limita la distancia de una ruta; no configura un centro de sondeo fijo ni reemplaza la cobertura del raster.
 
@@ -94,7 +103,7 @@ Los errores usan `{ "code", "message", "details"? }`:
 | 422 | `NO_FEASIBLE_ROUTE` | No existe camino transitable |
 | 422 | `ROUTE_DISTANCE_EXCEEDED` | El camino calculado supera `max_km` |
 | 503 | `DATASET_UNAVAILABLE` | No se encuentra `RUTA_PENDIENTE` |
-| 503 | `INVALID_DATASET` | Falta CRS, radio o proyección equirectangular compatible |
+| 503 | `INVALID_DATASET` | El GeoTIFF no cumple el contrato del raster de pendiente |
 | 504 | `SEARCH_LIMIT_EXCEEDED` | A* superó el límite de expansiones |
 
 `GET /api/v1/routes/{route_id}` responde 404 porque el almacenamiento persistente/en memoria de rutas no está implementado.

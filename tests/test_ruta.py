@@ -207,6 +207,18 @@ def test_start_over_slope_limit_reports_measured_slope(tmp_path, monkeypatch):
     assert response.json()["details"] == {"slope_deg": 12.27, "max_slope_deg": 12.0}
 
 
+def test_invalid_raster_returns_service_unavailable(tmp_path, monkeypatch):
+    path, *_ = _install_raster(tmp_path, monkeypatch, width=60, height=400)
+    path.write_bytes(b"not a GeoTIFF")
+    response = _post_route(
+        {"latitude": CENTER_LAT, "longitude": CENTER_LON},
+        _coordinate_at_distance(500.0, "north"),
+    )
+
+    assert response.status_code == 503
+    assert response.json()["code"] == "INVALID_DATASET"
+
+
 @pytest.mark.parametrize(
     "parameters",
     [
