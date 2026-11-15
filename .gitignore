@@ -61,3 +61,10 @@ htmlcov/
 *.log
 *.sqlite3
 *.db
+
+# --- Rasters de producción local ---
+data/processed/*.tif
+data/processed/*.tiff
+map_mart/*.tif
+map_mart/*.tiff
+map_mart/*.tif.aux.xml

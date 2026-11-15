@@ -1,0 +1,68 @@
+PDS_VERSION_ID                 = PDS3
+
+/* FILE CHARACTERISTICS */
+RECORD_TYPE                    = FIXED_LENGTH
+RECORD_BYTES                   = 131356
+FILE_RECORDS                   = 72
+
+/* POINTERS TO DATA OBJECTS */
+^TABLE                         = "SGS_04_000_015_00.DAT"
+
+/* IDENTIFICATION DATA ELEMENTS */
+DATA_SET_NAME                  = "ODY MARS GAMMA RAY SPECTROMETER 5 SGS V1.0"
+DATA_SET_ID                    = "ODY-M-GRS-5-SGS-V1.0"
+PRODUCT_ID                     = "SGS_04_000_015_00"
+PRODUCT_TYPE                   = "SUMMED_GAMMA_SPECTRA"
+PRODUCT_VERSION_ID             = "1.0"
+RELEASE_ID                     = "0025"
+
+/* DESCRIPTIVE DATA ELEMENTS */
+INSTRUMENT_HOST_NAME           = "2001 MARS ODYSSEY"
+INSTRUMENT_NAME                = "GAMMA RAY SPECTROMETER"
+SPACECRAFT_ID                  = ODY
+TARGET_NAME                    = MARS
+MISSION_PHASE_NAME             = "EXTENDED MISSION"
+CENTER_LATITUDE                = 87.5
+START_TIME                     = 2007-12-10T00:02:16.974
+STOP_TIME                      = 2008-01-09T23:07:47.224
+START_SOLAR_LONGITUDE          = 000
+STOP_SOLAR_LONGITUDE           = 015
+SPACECRAFT_CLOCK_START_COUNT   = 225718397615
+SPACECRAFT_CLOCK_STOP_COUNT    = 226403232167
+PRODUCT_CREATION_TIME          = 2008-09-22T19:20:12.985
+
+/* DATA OBJECT DEFINITION */
+OBJECT                         = TABLE
+
+  INTERCHANGE_FORMAT           = BINARY
+  ROWS                         = 72
+  ROW_BYTES                    = 131356
+
+  /* The complete column definitions are contained in an external file */
+  /* found in the LABEL directory of the archive disk.                 */
+  
+  COLUMNS                      = 54
+  ^STRUCTURE                   = "SUMMED_GAMMA_SPECTRA_COLS.FMT"
+
+  /* DESCRIPTIVE data elements */
+
+  DESCRIPTION                  = "
+
+     The SGS product contains sums of corrected gamma spectra with
+     ancillary data. The data has been summed spatially over a 
+     5 degree by 5 degree grid and temporally over intervals of 15
+     degrees of solar longitude.
+
+     The SGS product data is presented in a tables corresponding to 
+     the 36 latitude bands of the 5x5 degree grid.
+
+     This file is for the band centered at 87.5 degrees latitude.
+    
+     Within each band, longitude increases eastward from the cell
+     centered at 2.5 degrees east longitude to the cell centered at 
+     357.5 degrees east longitude.
+  "
+
+END_OBJECT                     = TABLE
+
+END
