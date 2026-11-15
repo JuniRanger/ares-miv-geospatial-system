@@ -2,10 +2,13 @@
 
 import logging
 
-from app.api.routes import health, mars_data, route_planner
-from fastapi import FastAPI, HTTPException, Request
+from app.api.routes import health, mars_data, route_planner, stubs
+from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
+from fastapi.encoders import jsonable_encoder
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.routes import terrain
 from app.config import settings
@@ -19,23 +22,31 @@ def create_app() -> FastAPI:
     application = FastAPI(
         title="Martian Route Planner API",
         description=(
-            "Backend API for Mars data metadata, terrain queries, and route planning. "
-            "Scientific data and route-planning functionality are not yet implemented."
+            "Backend API for Mars data metadata, terrain queries, and human route planning. "
+            "Route planning requires a validated local slope GeoTIFF."
         ),
         version=settings.api_version,
         openapi_url="/openapi.json",
         docs_url="/docs",
         redoc_url="/redoc",
     )
+    application.add_middleware(
+        CORSMiddleware,
+        allow_origins=[origin.strip() for origin in settings.cors_origins.split(",") if origin.strip()],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
     application.include_router(health.router, prefix=settings.api_prefix)
     application.include_router(mars_data.router, prefix=settings.api_prefix)
     application.include_router(terrain.router, prefix=settings.api_prefix)
     application.include_router(route_planner.router, prefix=settings.api_prefix)
+    application.include_router(stubs.router, prefix=settings.api_prefix)
 
-    @application.exception_handler(HTTPException)
+    @application.exception_handler(StarletteHTTPException)
     async def http_exception_handler(
-        request: Request, exception: HTTPException
+        request: Request, exception: StarletteHTTPException
     ) -> JSONResponse:
         """Return HTTP errors in the API's consistent error format."""
         if isinstance(exception.detail, dict):
@@ -44,7 +55,7 @@ def create_app() -> FastAPI:
             detail = ErrorDetail(code="HTTP_ERROR", message=str(exception.detail))
         return JSONResponse(
             status_code=exception.status_code,
-            content=ErrorResponse(error=detail).model_dump(),
+            content=ErrorResponse(**detail.model_dump()).model_dump(exclude_none=True),
             headers=exception.headers,
         )
 
@@ -54,12 +65,13 @@ def create_app() -> FastAPI:
     ) -> JSONResponse:
         """Return request validation failures in the API's error format."""
         detail = ErrorDetail(
-            code="INVALID_REQUEST",
+            code="VALIDATION_ERROR",
             message="The request does not match the required API contract.",
+            details={"issues": jsonable_encoder(exception.errors())},
         )
         return JSONResponse(
             status_code=422,
-            content=ErrorResponse(error=detail).model_dump(),
+            content=ErrorResponse(**detail.model_dump()).model_dump(exclude_none=True),
         )
 
     @application.exception_handler(Exception)
@@ -77,7 +89,7 @@ def create_app() -> FastAPI:
         )
         return JSONResponse(
             status_code=500,
-            content=ErrorResponse(error=detail).model_dump(),
+            content=ErrorResponse(**detail.model_dump()).model_dump(exclude_none=True),
         )
 
     return application

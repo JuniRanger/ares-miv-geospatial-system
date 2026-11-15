@@ -20,7 +20,9 @@ class TerrainResponse(BaseModel):
     latitude: float
     longitude: float
     elevation_m: float | None
-    slope_degrees: float | None
-    roughness: float | None
+    slope_deg: float | None
+    roughness_m: float | None
     thermal_inertia: float | None
+    traversable: bool | None
+    radiation: float | None
     data_availability: DataAvailability

@@ -1,8 +1,8 @@
 # Martian Route Planner Backend
 
-Initial FastAPI backend scaffolding for Mars data metadata, terrain queries, and
-terrain-aware route planning. Scientific data access and route calculation are
-intentionally not implemented; the API does not fabricate measurements or routes.
+FastAPI backend for Mars data metadata, terrain queries, and human walking-route
+planning. The route endpoint runs A* over a local slope GeoTIFF; other scientific
+data services remain pending and the API does not fabricate measurements.
 
 ## Technology stack
 
@@ -13,8 +13,8 @@ Rasterio, GeoPandas, Shapely, Pytest, and HTTPX.
 
 - `app/api/routes/` — health, Mars data, terrain, and route endpoints
 - `app/schemas/` — request and response contracts
-- `app/services/` — application service interfaces
-- `app/algorithms/` — framework-independent algorithm interfaces
+- `app/services/` — route planning and data services
+- `app/algorithms/` — framework-independent A* and terrain algorithms
 - `app/database/` and `app/models/` — SQLAlchemy setup and model stubs
 - `data/` — raw, processed, and visual product locations
 - `scripts/` — offline ingestion and preprocessing commands
@@ -30,9 +30,10 @@ source .venv/bin/activate
 python -m pip install -r requirements.txt
 ```
 
-Set `DATA_FILE_PATH` if a static data file path is needed. The API reads
-configuration from static files in memory, so it can also run without a database.
-The default reads from static data files bundled with the application.
+Copy `.env.example` to `.env` and set `RUTA_PENDIENTE` to the 5 m slope GeoTIFF
+in `map_mart/slope_5m.tif`.
+The API can start without raster products or a database; route planning returns
+503 until the configured raster is present.
 
 Start the API:
 
@@ -40,28 +41,31 @@ Start the API:
 uvicorn app.main:app --reload
 ```
 
-The health endpoint is `http://127.0.0.1:8000/api/health`. OpenAPI documentation
-is available at `http://127.0.0.1:8000/docs`.
+The health endpoint is `http://127.0.0.1:8000/api/v1/health`, route planning is
+`POST http://127.0.0.1:8000/api/v1/routes/plan`, and OpenAPI documentation is at
+`http://127.0.0.1:8000/docs`.
 
 ## Environment configuration
 
-Copy `.env.example` to `.env` and update its development-only data file path
-before using Docker Compose. Available settings include `API_PREFIX`, `API_VERSION`,
-`DATA_FILE_PATH`, and `VISUAL_DATA_DIR`. Do not commit `.env` or real credentials.
+Docker Compose starts with defaults; copy `.env.example` to `.env` only when
+overriding them. Available settings include `API_PREFIX`, `API_VERSION`,
+`CORS_ORIGINS`, `DATA_LOCAL_DIR`, `RUTA_PENDIENTE`, `DATA_FILE_PATH`, and
+`VISUAL_DATA_DIR`. `RUTA_PENDIENTE` selects the 5 m slope GeoTIFF and is opened
+only when a route is requested. `CORS_ORIGINS` is a comma-separated list and
+defaults to `http://localhost:5173`. Do not commit `.env` or credentials.
 
 ## Docker
 
 From this directory:
 
 ```bash
-cp .env.example .env
 docker compose up --build
 ```
 
-The Compose stack starts the API. The API container is not
-blocked on a successful data file health check. The Docker image installs GDAL's
-system utilities and development libraries; Rasterio and GeoPandas are installed
-from their Python package dependencies.
+The Compose stack starts only the API; no database container is required. Missing
+datasets make `/api/v1/health` return `503` with `status: "degraded"`, but do not
+prevent the application from starting. Rasterio and GeoPandas are installed from
+their Python package dependencies.
 
 ## Tests
 
@@ -74,6 +78,6 @@ a running database.
 
 ## Documentation
 
-See the project [documentation index](docs/README.md) for the
-[project overview](../docs/PROJECT_OVERVIEW.md), [architecture](../docs/ARCHITECTURE.md),
-[API contracts](../docs/API_CONTRACTS.md), and [development plan](../docs/DEVELOPMENT_PLAN.md).
+See the [route planning guide](docs/ROUTE_PLANNING.md), [API contracts](docs/API_CONTRACTS.md),
+[project overview](docs/PROJECT_OVERVIEW.md), [architecture](docs/ARCHITECTURE.md),
+[raw data ingestion guide](docs/RAW_DATA_INGESTION.md), and [development plan](docs/DEVELOPMENT_PLAN.md).

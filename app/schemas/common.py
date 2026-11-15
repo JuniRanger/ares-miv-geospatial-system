@@ -1,6 +1,6 @@
 """Shared API response schemas."""
 
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel
 
@@ -10,20 +10,25 @@ class ErrorDetail(BaseModel):
 
     code: str
     message: str
+    details: dict[str, Any] | None = None
 
 
 class ErrorResponse(BaseModel):
     """Consistent API error envelope."""
 
-    error: ErrorDetail
+    code: str
+    message: str
+    details: dict[str, Any] | None = None
 
 
 class HealthResponse(BaseModel):
     """API availability information."""
 
-    status: Literal["ok"]
+    status: Literal["ok", "degraded"]
     api_version: str
-    storage_status: Literal["not_checked"] = "not_checked"
+    datasets: dict[str, Literal["available", "unavailable"]]
+    layers: dict[str, Literal["available", "partial", "estimated", "unavailable"]]
+    database_status: Literal["disabled"] = "disabled"
 
 
 class WarningInfo(BaseModel):
@@ -32,6 +37,10 @@ class WarningInfo(BaseModel):
     code: str
     message: str
     severity: Literal["info", "warning", "critical"] = "warning"
+    latitude: float
+    longitude: float
+    distance_m: float
+    length_m: float | None = None
 
 
 class DataAvailability(BaseModel):
@@ -41,6 +50,7 @@ class DataAvailability(BaseModel):
     slope: bool
     roughness: bool
     thermal: bool
+    radiation: bool = False
 
 
 class LayerMetadata(BaseModel):
@@ -49,11 +59,23 @@ class LayerMetadata(BaseModel):
     layer_id: str
     name: str
     description: str
+    category: Literal[
+        "optical", "topographic", "thermal", "spectral", "geologic", "radiation", "derived"
+    ] = "derived"
+    role: Literal["display", "cost"] = "display"
+    quality: Literal["available", "partial", "estimated", "unavailable"] = "unavailable"
     available: bool
     source: str | None
     units: str | None
     spatial_resolution: str | None
     coordinate_reference_system: str | None
+    tile_url: str | None = None
+    raster_url: str | None = None
+    tiling_scheme: dict[str, Any] | None = None
+    bbox: tuple[float, float, float, float] | None = None
+    max_level: int | None = None
+    default_opacity: float | None = None
+    legend: dict[str, Any] | None = None
 
 
 class LayerListResponse(BaseModel):
