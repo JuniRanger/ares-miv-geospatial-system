@@ -1,0 +1,694 @@
+OBJECT = COLUMN
+  COLUMN_NUMBER = 1
+  NAME = SC_RECV_TIME
+  DATA_TYPE = MSB_UNSIGNED_INTEGER
+  BYTES = 8
+  START_BYTE = 1
+  DESCRIPTION = "
+  The time this packet was received by the spacecraft, in ticks (256 per 
+second).
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 2
+  NAME = CEB_TIME
+  DATA_TYPE = MSB_UNSIGNED_INTEGER
+  BYTES = 8
+  START_BYTE = 9
+  DESCRIPTION = "
+  Clock count from the GRS Common Electronics Box at the beginning of the 
+pixel.
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 3
+  NAME = UTC
+  DATA_TYPE = CHARACTER
+  BYTES = 23
+  START_BYTE = 17
+  DESCRIPTION = "
+  Time at the middle of the collection interval converted to UTC, stored 
+as yyyy-mm-ddThh:mm:ss.sss.
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 4
+  NAME = GRS_PIXEL_NUMBER
+  DATA_TYPE = MSB_UNSIGNED_INTEGER
+  BYTES = 4
+  START_BYTE = 40    
+  INVALID_CONSTANT = 0
+  DESCRIPTION = "
+  Sequential counter of accumulation intervals, starts with one as grs 
+orbit begins. Special case on reboot when the the CEB is in orbit 0, 
+pixel 0.
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 5
+  NAME = GRS_ORBIT_NUMBER
+  DATA_TYPE = MSB_UNSIGNED_INTEGER
+  BYTES = 4
+  START_BYTE = 44    
+  INVALID_CONSTANT = 0
+  DESCRIPTION = "
+  Sequential counter of orbits from GRS CEB boot.
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 6
+  NAME = ODY_ORBIT_NUMBER
+  DATA_TYPE = MSB_UNSIGNED_INTEGER
+  BYTES = 4
+  START_BYTE = 48    
+  INVALID_CONSTANT = 0
+  DESCRIPTION = "
+  Orbit number common to all instruments aboard Odyssey. This orbit 
+number is incremented by one as the spacecraft passes through the 
+orbital descending node.
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 7
+  NAME = AREOCENTRIC_LATITUDE
+  DATA_TYPE = IEEE_REAL
+  BYTES = 4
+  START_BYTE = 52    
+  UNIT = DEGREE
+  DESCRIPTION = "
+  Sub spacecraft latitude in Mars fixed coordinates at the middle of the 
+collection interval.
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 8
+  NAME = AREOCENTRIC_EAST_LONGITUDE
+  DATA_TYPE = IEEE_REAL
+  BYTES = 4
+  START_BYTE = 56    
+  UNIT = DEGREE
+  DESCRIPTION = "
+  Sub spacecraft longitude in Mars fixed coordinates at the middle of the 
+collection interval. Longitude increases towards the East.
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 9
+  NAME = ALTITUDE
+  DATA_TYPE = IEEE_REAL
+  BYTES = 4
+  START_BYTE = 60    
+  UNIT = KILOMETER
+  DESCRIPTION = "
+  Areocentric altitude of the sub-spacecraft point in Mars-fixed rotating 
+frame at the middle of the collection interval.
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 10
+  NAME = SCPOS_INERT
+  DATA_TYPE = IEEE_REAL
+  BYTES = 12
+  START_BYTE = 64    
+  UNIT = KILOMETER    
+  ITEMS = 3    
+  ITEM_BYTES = 4
+  DESCRIPTION = "
+  The geometric position (x,y,z) of the spacecraft with respect to Mars 
+in the 'MARSIAU' IAU2000 reference system inertial frame at the input 
+epoch 'et' at the middle of the pixel.
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 11
+  NAME = SCVEL_INERT
+  DATA_TYPE = IEEE_REAL
+  BYTES = 12
+  START_BYTE = 76    
+  UNIT = "KILOMETER/SECOND"    
+  ITEMS = 3    
+  ITEM_BYTES = 4
+  DESCRIPTION = "
+  The geometric velocity (x,y,z) of the spacecraft with respect to Mars 
+in the 'MARSIAU' IAU2000 reference system inertial frame at the input 
+epoch 'et' at the middle of the pixel.
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 12
+  NAME = MARSPOS_INSTR
+  DATA_TYPE = IEEE_REAL
+  BYTES = 12
+  START_BYTE = 88    
+  UNIT = KILOMETER    
+  ITEMS = 3    
+  ITEM_BYTES = 4
+  DESCRIPTION = "
+  The (x,y,z) position of the sub-spacecraft point as seen from the 
+spacecraft in the instrument frame at the middle of the collection 
+interval. If no spacecraft orientation data was available from the 
+loaded CK files for the request time, then all elements of are set to 
+zero.
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 13
+  NAME = MARSVEL_INSTR
+  DATA_TYPE = IEEE_REAL
+  BYTES = 12
+  START_BYTE = 100    
+  UNIT = "KILOMETER/SECOND"    
+  ITEMS = 3    
+  ITEM_BYTES = 4
+  DESCRIPTION = "
+  Contains the inertial spacecraft velocity direction (x,y,z) rotated to 
+the instrument frame at the middle of the collection interval. If no 
+spacecraft orientation data was available for the request time, then 
+all elements are set to zero.
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 14
+  NAME = DAY_INDEX
+  DATA_TYPE = MSB_UNSIGNED_INTEGER
+  BYTES = 2
+  START_BYTE = 112
+  DESCRIPTION = "
+  Day of Martian year.
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 15
+  NAME = LOCAL_HOUR
+  DATA_TYPE = MSB_UNSIGNED_INTEGER
+  BYTES = 2
+  START_BYTE = 114
+  DESCRIPTION = "
+  Local Sun hour at the sub-spacecraft point.
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 16
+  NAME = LOCAL_MINUTE
+  DATA_TYPE = MSB_UNSIGNED_INTEGER
+  BYTES = 2
+  START_BYTE = 116
+  DESCRIPTION = "
+  Local Sun minute at the sub-spacecraft point.
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 17
+  NAME = PIXEL_DURATION
+  DATA_TYPE = IEEE_REAL
+  BYTES = 4
+  START_BYTE = 118    
+  UNIT = SECOND
+  DESCRIPTION = "
+  Length of the collection interval in seconds.
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 18
+  NAME = POWER_SUPPLY
+  DATA_TYPE = MSB_UNSIGNED_INTEGER
+  BYTES = 2
+  START_BYTE = 122
+  DESCRIPTION = "
+  Which power supply is being used, 1 or 2.
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 19
+  NAME = SWAP_FLAG
+  DATA_TYPE = MSB_UNSIGNED_INTEGER
+  BYTES = 2
+  START_BYTE = 124
+  DESCRIPTION = "
+  The state of the prompt/delayed swap flag.
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 20
+  NAME = POWER_LEVEL
+  DATA_TYPE = MSB_UNSIGNED_INTEGER
+  BYTES = 2
+  START_BYTE = 126
+  DESCRIPTION = "
+  The power level of the power supply in use during the collection 
+interval, 1 being highest power and 7 being lowest power.
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 21
+  NAME = DIRECTION
+  DATA_TYPE = MSB_UNSIGNED_INTEGER
+  BYTES = 1
+  START_BYTE = 128
+  DESCRIPTION = "
+  Direction of spacecraft travel N(1) or S(0).
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 22
+  NAME = LIVETIME
+  DATA_TYPE = IEEE_REAL
+  BYTES = 4
+  START_BYTE = 129    
+  UNIT = SECOND
+  DESCRIPTION = "
+  In seconds, duration - deadtime, where deadtime = dead_cnt * .000512 
+sec.
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 23
+  NAME = DEADTIME_PERCENT
+  DATA_TYPE = IEEE_REAL
+  BYTES = 4
+  START_BYTE = 133
+  DESCRIPTION = "
+  Deadtime / duration.
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 24
+  NAME = OVERLOAD_RATE
+  DATA_TYPE = IEEE_REAL
+  BYTES = 4
+  START_BYTE = 137
+  DESCRIPTION = "
+  The OVERLOAD_RATE gives an estimate of the flux of charged particles 
+that deposit energies greater than about 2.6 MeV. The OVERLOAD_RATE is 
+determined by dividing the EDR GCR_CNT field by 110 cm2, which is the 
+average projected area of the spectrometer, and by the collection 
+interval duration (DND PIXEL_DURATION field). The units are centimeters 
+squared per second. Note that the GCR_CNT field gives the number of 
+overload events during a collection interval, corresponding to events 
+that produce greater than 2.6 MeV equivalent light output. While these 
+events can be caused by gamma rays and neutrons, most are associated 
+with energetic particles. When the OVERLOAD_RATE is lowest, overload 
+events are dominated by galactic cosmic rays, in which case the 
+OVERLOAD_RATE gives an estimate of the galactic cosmic ray flux. The 
+OVERLOAD_RATE is primarily used to identify periods of high count rate, 
+which corresponding to energetic particle events. Such events are 
+filtered from the DND data set by the processing algorithms.
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 25
+  NAME = HVPS_MNTR_2
+  DATA_TYPE = IEEE_REAL
+  BYTES = 4
+  START_BYTE = 141    
+  UNIT = VOLT
+  DESCRIPTION = "
+  The value of the High Voltage Power Supply Monitor 2 at the mid point 
+of the collection interval that has been smoothed with a Gaussian 
+weighted smoothing algorithm over 30 HVPS_MNTR_2 measurements and 
+interpolated to the time at the middle of the NS collection interval 
+from the HVPS_MNTR_2 engineering measurement that happens just before 
+the NS collection interval and the one just after the NS collection 
+interval.
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 26
+  NAME = LAT_1
+  DATA_TYPE = IEEE_REAL
+  BYTES = 4
+  START_BYTE = 145    
+  UNIT = DEGREE
+  DESCRIPTION = "
+  Latitude in degrees to be associated with CAT1, Prism 1 count rate and 
+error
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 27
+  NAME = LON_1
+  DATA_TYPE = IEEE_REAL
+  BYTES = 4
+  START_BYTE = 149    
+  UNIT = DEGREE
+  DESCRIPTION = "
+  Longitude in degrees to be associated with CAT1, Prism 1 count rate and 
+error
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 28
+  NAME = LAT_4_5
+  DATA_TYPE = IEEE_REAL
+  BYTES = 4
+  START_BYTE = 153    
+  UNIT = DEGREE
+  DESCRIPTION = "
+  Latitude in degrees to be associated with the thermal count rate and 
+error
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 29
+  NAME = LON_4_5
+  DATA_TYPE = IEEE_REAL
+  BYTES = 4
+  START_BYTE = 157    
+  UNIT = DEGREE
+  DESCRIPTION = "
+  Longitude in degrees to be associated with the thermal count rate and 
+error
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 30
+  NAME = CAT1_PRISM1_PEAK_AREA
+  DATA_TYPE = IEEE_REAL
+  BYTES = 4
+  START_BYTE = 161
+  DESCRIPTION = "
+  The counting rate given by the area in the 10B(n,alpha)7Li reaction 
+peak above background registered by prism 1, in units of s^-1. The 
+counting rate as measured is normalized by the ratio of the average 
+Cat1 Prism1 counting rate averaged over all transits between +30 
+degrees and -30 degrees latitude measured within +0.5 and -0.5 days of 
+the current data point. This counting rate is also the epithermal 
+neutron counting rate.
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 31
+  NAME = CAT1_PRISM1_ERROR
+  DATA_TYPE = IEEE_REAL
+  BYTES = 4
+  START_BYTE = 165
+  DESCRIPTION = "
+  The 1-sigma statistical error of the CAT1_PRISM1_PEAK_AREA (counts/s).
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 32
+  NAME = CAT1_PRISM2_PEAK_AREA
+  DATA_TYPE = IEEE_REAL
+  BYTES = 4
+  START_BYTE = 169
+  DESCRIPTION = "
+  The counting rate given by the area in the 10B(n,alpha)7Li reaction 
+peak above background registered by prism 2, in units of s^-1. The 
+counting rate as measured is normalized by the ratio of the average 
+Cat1 Prism2 counting rate averaged over all transits between +30 
+degrees and -30 degrees latitude measured within +0.5 and -0.5 days of 
+the current data point.
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 33
+  NAME = CAT1_PRISM2_ERROR
+  DATA_TYPE = IEEE_REAL
+  BYTES = 4
+  START_BYTE = 173
+  DESCRIPTION = "
+  The 1-sigma statistical error of the CAT1_PRISM2_PEAK_AREA (counts/s).
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 34
+  NAME = CAT1_PRISM3_PEAK_AREA
+  DATA_TYPE = IEEE_REAL
+  BYTES = 4
+  START_BYTE = 177
+  DESCRIPTION = "
+  The counting rate given by the area in the 10B(n,alpha)7Li reaction 
+peak above background registered by prism 3, in units of s^-1. The 
+counting rate as measured is normalized by the ratio of the average 
+Cat1 Prism3 counting rate averaged over all transits between +30 
+degrees and -30 degrees latitude measured within +0.5 and -0.5 days of 
+the current data point.
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 35
+  NAME = CAT1_PRISM3_ERROR
+  DATA_TYPE = IEEE_REAL
+  BYTES = 4
+  START_BYTE = 181
+  DESCRIPTION = "
+  The 1-sigma statistical error of the CAT1_PRISM3_PEAK_AREA (counts/s).
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 36
+  NAME = CAT1_PRISM4_PEAK_AREA
+  DATA_TYPE = IEEE_REAL
+  BYTES = 4
+  START_BYTE = 185
+  DESCRIPTION = "
+  The counting rate given by the area in the 10B(n,alpha)7Li reaction 
+peak above background registered by prism 4, in units of s^-1. The 
+counting rate as measured is normalized by the ratio of the average 
+Cat1 Prism4 counting rate averaged over all transits between +30 
+degrees and -30 degrees latitude measured within +0.5 and -0.5 days of 
+the current data point.
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 37
+  NAME = CAT1_PRISM4_ERROR
+  DATA_TYPE = IEEE_REAL
+  BYTES = 4
+  START_BYTE = 189
+  DESCRIPTION = "
+  The 1-sigma statistical error of the CAT1_PRISM4_PEAK_AREA (counts/s).
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 38
+  NAME = CAT2_PRISM1_FAST_SUM
+  DATA_TYPE = IEEE_REAL
+  BYTES = 4
+  START_BYTE = 193
+  DESCRIPTION = "
+  The sum of the counting rate in the lowest two channels of the 
+[(early-time) - (late time)] fast-neutron histograms, in units of s^-1. 
+The counting rate as measured is normalized by the ratio of the average 
+CAT2_PRISM1_FAST_SUM counting rate averaged over all transits between 
++30 degrees and -30 degrees latitude measured within +0.5 and -0.5 days 
+of the current data point.
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 39
+  NAME = CAT2_PRISM1_ERROR
+  DATA_TYPE = IEEE_REAL
+  BYTES = 4
+  START_BYTE = 197
+  DESCRIPTION = "
+  The 1-sigma statistical error of the CAT2_PRISM1_FAST_SUM (counts/s).
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 40
+  NAME = THERMAL_COUNT_RATE
+  DATA_TYPE = IEEE_REAL
+  BYTES = 4
+  START_BYTE = 201
+  DESCRIPTION = "
+  The difference between CAT1_PRISM2_Peak_Area and CAT1_PRISM4_Peak_Area, 
+in units of s^-1. The counting rate as measured is normalized by the 
+ratio of the Thermal Count Rate averaged over all transits between +30 
+degrees and -30 degrees latitude measured within +0.5 and -0.5 days of 
+the current data point.
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 41
+  NAME = THERMAL_ERROR
+  DATA_TYPE = IEEE_REAL
+  BYTES = 4
+  START_BYTE = 205
+  DESCRIPTION = "
+  The 1-sigma statistical error of the THERMAL_COUNT_RATE (counts/s)
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 42
+  NAME = CAT1_PRISM1_NORM_SLOPE
+  DATA_TYPE = IEEE_REAL
+  BYTES = 4
+  START_BYTE = 209
+  DESCRIPTION = "
+  The slope parameter for the bellyband normalization for the 
+CAT1_PRISM1_PEAK_AREA.
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 43
+  NAME = CAT1_PRISM1_NORM_OFFSET
+  DATA_TYPE = IEEE_REAL
+  BYTES = 4
+  START_BYTE = 213
+  DESCRIPTION = "
+  The offset parameter for the bellyband normalization for the 
+CAT1_PRISM1_PEAK_AREA.
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 44
+  NAME = CAT1_PRISM2_NORM_SLOPE
+  DATA_TYPE = IEEE_REAL
+  BYTES = 4
+  START_BYTE = 217
+  DESCRIPTION = "
+  The slope parameter for the bellyband normalization for the 
+CAT1_PRISM2_PEAK_AREA.
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 45
+  NAME = CAT1_PRISM2_NORM_OFFSET
+  DATA_TYPE = IEEE_REAL
+  BYTES = 4
+  START_BYTE = 221
+  DESCRIPTION = "
+  The offset parameter for the bellyband normalization for the 
+CAT1_PRISM2_PEAK_AREA.
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 46
+  NAME = CAT1_PRISM3_NORM_SLOPE
+  DATA_TYPE = IEEE_REAL
+  BYTES = 4
+  START_BYTE = 225
+  DESCRIPTION = "
+  The slope parameter for the bellyband normalization for the 
+CAT1_PRISM3_PEAK_AREA.
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 47
+  NAME = CAT1_PRISM3_NORM_OFFSET
+  DATA_TYPE = IEEE_REAL
+  BYTES = 4
+  START_BYTE = 229
+  DESCRIPTION = "
+  The offset parameter for the bellyband normalization for the 
+CAT1_PRISM3_PEAK_AREA.
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 48
+  NAME = CAT1_PRISM4_NORM_SLOPE
+  DATA_TYPE = IEEE_REAL
+  BYTES = 4
+  START_BYTE = 233
+  DESCRIPTION = "
+  The slope parameter for the bellyband normalization for the 
+CAT1_PRISM4_PEAK_AREA.
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 49
+  NAME = CAT1_PRISM4_NORM_OFFSET
+  DATA_TYPE = IEEE_REAL
+  BYTES = 4
+  START_BYTE = 237
+  DESCRIPTION = "
+  The offset parameter for the bellyband normalization for the 
+CAT1_PRISM4_PEAK_AREA.
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 50
+  NAME = CAT2_PRISM1_NORM_SLOPE
+  DATA_TYPE = IEEE_REAL
+  BYTES = 4
+  START_BYTE = 241
+  DESCRIPTION = "
+  The slope parameter for the bellyband normalization for the 
+CAT2_PRISM1_FAST_SUM.
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 51
+  NAME = CAT2_PRISM1_NORM_OFFSET
+  DATA_TYPE = IEEE_REAL
+  BYTES = 4
+  START_BYTE = 245
+  DESCRIPTION = "
+  The offset parameter for the bellyband normalization for the 
+CAT2_PRISM1_FAST_SUM.
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 52
+  NAME = CF_ATM_EPI
+  DATA_TYPE = IEEE_REAL
+  BYTES = 4
+  START_BYTE = 249
+  DESCRIPTION = "
+  Correction factor for atmospheric mass for epithermal neutrons.
+  "
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+  COLUMN_NUMBER = 53
+  NAME = CF_ATM_FAST
+  DATA_TYPE = IEEE_REAL
+  BYTES = 4
+  START_BYTE = 253
+  DESCRIPTION = "
+  Correction factor for atmospheric mass for fast neutrons.
+  "
+END_OBJECT = COLUMN
