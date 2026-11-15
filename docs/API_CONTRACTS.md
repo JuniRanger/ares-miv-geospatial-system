@@ -217,6 +217,37 @@ Response fields are calculated from the requested route and the configured slope
   "tiempo_caminando_h": 1.2,
   "tiempo_descanso_h": 0.33,
   "tiempo_total_h": 1.53,
+  "referencia_neutrones": {
+    "estado": "available",
+    "fuente": "Mars Odyssey GRS / Neutron Spectrometer, producto AND",
+    "producto_id": "ODY-M-GRS-5-AND-V2.0 / AND_13_225_240",
+    "fecha_inicio_utc": "2026-02-13T00:00:00Z",
+    "fecha_fin_utc": "2026-03-09T00:00:00Z",
+    "longitud_solar_inicio_deg": 225.0,
+    "longitud_solar_fin_deg": 240.0,
+    "resolucion_espacial_deg": [5.0, 5.0],
+    "unidad": "cuentas/s",
+    "es_dosis": false,
+    "usada_por_astar": false,
+    "mensaje": "Conteos regionales de neutrones; no son dosis de radiación ni se usan como costo de A*. La resolución es mucho más gruesa que la ruta de 5 m.",
+    "zonas": [
+      {
+        "latitud_centro_areocentrica_deg": -2.5,
+        "longitud_centro_este_deg": 137.5,
+        "celdas_vecinas_disponibles": 8,
+        "termicos_cuentas_s": 7.375773,
+        "termicos_desviacion_cuentas_s": 2.121895,
+        "termicos_intervalos": 40,
+        "termicos_media_vecinos_cuentas_s": 7.181726,
+        "termicos_diferencia_vecinos_pct": 2.70,
+        "epitermicos_cuentas_s": 6.854561,
+        "epitermicos_desviacion_cuentas_s": 1.351516,
+        "epitermicos_intervalos": 40,
+        "epitermicos_media_vecinos_cuentas_s": 6.612561,
+        "epitermicos_diferencia_vecinos_pct": 3.66
+      }
+    ]
+  },
   "supuestos": [
     "Modelo: persona caminando con traje espacial, no rover.",
     "La velocidad máxima nominal se basa en Apolo: 3,5 km/h medidos en la Luna.",
@@ -235,6 +266,8 @@ Rules:
 - A stop is selected at the minimum slope between 1.0 and 1.5 km from the previous stop or origin; the destination is never a stop.
 - `horas_caminando` uses `v = velocidad_ms * max(0.2, 1 - pendiente_local / 20)` at each step.
 - `tiempo_descanso_h` is the number of stops multiplied by `descanso_min / 60`.
+- `referencia_neutrones.zonas` reports the AND product's thermal and epithermal neutron count rates for every 5° × 5° cell touched by the route, with reported spread and descriptive comparison to available neighboring cells.
+- The AND product is a coarse regional neutron reference, not a human radiation dose; it is not included in the A* cost.
 - The example is illustrative; the returned route values are computed from the selected raster.
 
 `warnings[].code` values:

@@ -90,7 +90,10 @@ En éxito se devuelve `200` con:
 - `distancia_km`, `resolucion_m`, `pendiente_max_en_ruta_deg` y `puntos`.
 - `tramos`: número, distancia, tiempo caminando y `parada`; la parada del último tramo es `null`.
 - `tiempo_caminando_h`, `tiempo_descanso_h` y `tiempo_total_h`.
+- `referencia_neutrones`: tasas térmica y epitérmica por cada celda AND de 5° × 5° atravesada, con fuente, fechas, Ls, resolución, dispersión y comparación descriptiva con celdas vecinas.
 - `supuestos`: procedencia y límites científicos del modelo.
+
+La referencia se obtiene de `data/raw/and_13_225_240.dat` (Mars Odyssey GRS / Neutron Spectrometer), promediado para Ls 225–240 entre el 13 de febrero y el 9 de marzo de 2026. Sus unidades son cuentas/s. **No son una dosis en mGy ni una predicción de exposición de una persona**, y no se usan como costo de A*. Una ruta de hasta 10 km normalmente queda en una única celda de 5°; por eso el dato no distingue riesgos entre puntos cercanos a 5 m. Las diferencias frente a celdas vecinas son descriptivas y deben leerse junto con las desviaciones reportadas.
 
 Los errores usan `{ "code", "message", "details"? }`:
 
